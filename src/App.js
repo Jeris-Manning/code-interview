@@ -1,58 +1,57 @@
-import logo from './logo.svg';
-import styled, {ThemeProvider} from 'styled-components';
-import {Header} from './basics/Header';
-import {Footer} from './basics/Footer';
-import {useState} from 'react';
-import {Button} from './basics/Button';
-import {Body} from './basics/Body';
-import {Page} from './basics/Page';
-import {ColorSchemer} from './ColorSchemer';
-
-export const THEME_DEFAULT = {
-	colors: {
-		text: '#000',
-		header: '#be3e3e',
-		footer: '#d28a8a',
-		background: '#d59898',
-		button: '#ff0000',
-		buttonHover: '#ff5151',
-		buttonActive: '#a60202',
-	},
-};
-
+import { useState } from "react";
+import { Button } from "./basics/Button";
+import ColorRow from "./ColorRow";
+import Layout from "./Layout";
+import { THEME_DEFAULT } from "./theming";
+import { getColors } from "./getColors";
 
 export const App = () => {
-	const [theme, setTheme] = useState(THEME_DEFAULT);
-	
-	return (
-		<Layout
-			theme={theme}
-			header={`That's no way to get a header in life 😬`}
-			footer={`A good footer is quite the... feet 🙄`}
-		>
-			<ColorSchemer
-				theme={theme}
-				setTheme={setTheme}
-			/>
-		</Layout>
-	);
-};
+  const [theme, setTheme] = useState(THEME_DEFAULT);
+  const [testTheme, setTestTheme] = useState(null);
+  const [test, setTest] = useState(null);
+  const [applyTest, setApplyTest] = useState(false);
 
-const Layout = (props) => {
-	const {
-		theme,
-		header,
-		footer,
-		children,
-	} = props;
-	
-	return (
-		<ThemeProvider theme={theme}>
-			<Page>
-				<Header>{header}</Header>
-				<Body>{children}</Body>
-				<Footer>{footer}</Footer>
-			</Page>
-		</ThemeProvider>
-	);
+  const seeSwatch = async () => {
+    getColors(setTestTheme);
+  };
+
+  const testSwatch = () => {
+    if (!testTheme) return null;
+    setTest({
+      colors: {
+        text: `rgb(${testTheme[0][0]}, ${testTheme[0][1]},${testTheme[0][2]})`,
+        header: `rgb(${testTheme[1][0]}, ${testTheme[1][1]},${testTheme[1][2]})`,
+        footer: `rgb(${testTheme[2][0]}, ${testTheme[2][1]},${testTheme[2][2]})`,
+        background: `rgb(${testTheme[3][0]}, ${testTheme[3][1]},${testTheme[3][2]})`,
+        button: `rgb(${testTheme[4][0]}, ${testTheme[4][1]},${testTheme[4][2]})`,
+        buttonHover: "#ff5151",
+        buttonActive: "#a60202"
+      }
+    });
+    setApplyTest(true);
+
+    setTimeout(() => {
+      setApplyTest(false);
+    }, 5000);
+  };
+
+  const applySwatch = () => {
+    setTheme(test);
+    setTestTheme(null);
+  };
+
+  return (
+    <Layout
+      theme={applyTest ? test : theme}
+      header={`That's no way to get a header in life 😬`}
+      footer={`A good footer is quite the... feet 🙄`}>
+      <Button onClick={seeSwatch} text={`Get Random`} />
+
+      <ColorRow testTheme={testTheme} />
+
+      <Button onClick={testSwatch} text={`Try`} />
+
+      <Button onClick={applySwatch} text={`Set`} />
+    </Layout>
+  );
 };
